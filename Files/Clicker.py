@@ -24,20 +24,24 @@ nana_bek = pygame.transform.scale(nana_bek_small, (462, 561))
 nana_bek_rect = nana_bek.get_rect()
 x, y = screen_middle
 nana_bek_rect.move_ip(x - 231, y - 280.5)
-# Load others
 
 
-code = [10, "abcdefghijklmnopqrstuvwxyz0123456789+-. _*/\[](){},':;!@$฿%^&<>?=~`"]
+# Load Auto Images
+auto_test_img = pygame.image.load("images/Autos/test.png")
 
+
+
+
+
+# Encoding and Decoding for money and other stored Data
+code = [10, "abcdefghijklmnopqrstuvwxyz0123456789+-. _*/\[](){},':;!@$฿%^&<>?=~`"] # character code
 
 def encode(val, charset):
     encoded = ""
     for idx in range(len(str(val))):
         tempEnc = encoded
         encoded = tempEnc + str(charset[0] + charset[1].index(str(val[idx])))
-    print(encoded)
     return encoded
-
 
 def decode(val, charset):
     charNum = 0
@@ -47,28 +51,63 @@ def decode(val, charset):
         charNum += 2
         tempDc = decoded
         decoded = tempDc + charset[1][int(idy) - 10]
-    print(decoded)
     return decoded
 
 
 
+
+# Define Autos / Buildings / do clicking for you
+class Autos():
+    def __init__(self, datalist):
+        self.total_autos = 0
+        self.autos = []
+        self.auto_data = []
+        print("Auto Class Made")
+
+    def New_Auto(self, Name, Cost, NSPps): # image files must be 50 x 50 pixels and JUST say the image name aka Clicker.png
+        global sx
+        y_coord = self.total_autos * 50
+        x_coord = sx - 100
+        self.autos.append((Name, Cost, x_coord, y_coord))
+        self.auto_data.append((Name, NSPps))
+        print("Generated New Auto Named '" + Name + "', Costing: " + str(Cost) + " Silver Spoons")
+
+
+    def BLIT(self):
+        for auto in self.autos:
+            N, C, x, y = auto
+            if N == "test":
+                win.blit(auto_test_img, (x, y))
+
+
+
+auto = Autos([("test", 1)])
+auto.New_Auto("test", 10, 1)
+
 def save():
+    # Save Money
     global balance
     encoded = encode(str(balance), code)
     f = open("Data/money.txt", "w")
     f.write(encoded)
     f.close()
+    # Save Autos
 
 
 
 
 
+# Getting All Needed Data For Game.
+
+# Get / Decode Money
 money_file = open("Data/money.txt", "r")
 balance_encoded = money_file.read()
 money_file.close()
-
 balance = decode(balance_encoded, code)
-print("balnce: ", balance)
+
+
+
+# Tests Before Game Loads
 save()
 
 
@@ -76,8 +115,9 @@ run = True
 
 while run:
     win.blit(background,(0, 0))
-    win.blit(nana_bek, nana_bek_rect)#(sx/ 2-231, sy/ 2-280.5)
+    win.blit(nana_bek, nana_bek_rect)
 
+    auto.BLIT()
 
 
 
