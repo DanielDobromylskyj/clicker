@@ -80,8 +80,10 @@ class Autos():
                 win.blit(auto_test_img, (x, y))
 
 
-
+# Init Autos
 auto = Autos([("test", 1)])
+
+# Generate Autos - They Will Appear top to bottom in the order that they are here.
 auto.New_Auto("test", 10, 1)
 
 def save():
@@ -104,7 +106,7 @@ money_file = open("Data/money.txt", "r")
 balance_encoded = money_file.read()
 money_file.close()
 balance = decode(balance_encoded, code)
-
+balance = int(balance)
 
 
 # Tests Before Game Loads
@@ -131,7 +133,8 @@ while run:
             if mouse_presses[0]:
                 x, y = pygame.mouse.get_pos()
                 if nana_bek_rect.collidepoint(x, y):
-                    print("clicked")
+                    balance += 1
+                    print("clicked nana")
 
     pygame.display.flip()
 
