@@ -62,6 +62,7 @@ class Autos():
         self.total_autos = 0
         self.autos = []
         self.auto_data = []
+        self.auto_rects = []
         print("Auto Class Made")
 
     def New_Auto(self, Name, Cost, NSPps): # image files must be 50 x 50 pixels and JUST say the image name aka Clicker.png
@@ -70,6 +71,14 @@ class Autos():
         x_coord = sx - 100
         self.autos.append((Name, Cost, x_coord, y_coord))
         self.auto_data.append((Name, NSPps))
+        x_pos = x_coord
+        y_pos = y_coord
+        width = 100
+        height = 50
+
+        # make the rectangle variable
+        rectangle = pygame.Rect(x_pos, y_pos, width, height)
+        self.auto_rects.append(rectangle)
         print("Generated New Auto Named '" + Name + "', Costing: " + str(Cost) + " Silver Spoons")
 
 
@@ -79,6 +88,23 @@ class Autos():
             if N == "test":
                 win.blit(auto_test_img, (x, y))
 
+    def check_click(self, x, y):
+        max_x, max_y = screensize
+        if nana_bek_rect.collidepoint(x, y): # quickly check they are not just clicking for spoons to save some time.
+            pass
+        else:
+
+            i = 0
+            for button in self.auto_rects:
+                if button.collidepoint(x, y):
+                    Clicked = i
+
+                i += 1
+            try:
+                i += Clicked # Test if Anything Is clicked
+                return self.auto_data[Clicked]
+            except:
+                pass
 
 # Init Autos
 auto = Autos([("test", 1)])
@@ -93,15 +119,32 @@ def save():
     f = open("Data/money.txt", "w")
     f.write(encoded)
     f.close()
-    # Save Autos
 
 
 
 
+def set_text(string, coordx, coordy, fontSize): #Function to set text
 
-# Getting All Needed Data For Game.
+    font = pygame.font.Font('freesansbold.ttf', fontSize)
+    text = font.render(string, True, (0, 0, 0))
+    textRect = text.get_rect()
+    textRect.center = (coordx, coordy)
+    return (text, textRect)
 
-# Get / Decode Money
+
+def display_info(balance):
+    global screen_middle
+    x = screen_middle[0]
+    if balance <= 1:
+        bal = str(balance) + " Nana's Silver Spoon"
+    else:
+        bal = str(balance) + " Nana's Silver Spoons"
+    s = set_text(bal, x, 100, 20)
+    win.blit(s[0], s[1])
+
+# Getting All Needed Data For Game. - MAIN BRANCH
+
+# Get / Decode Money - SUB BRANCH
 money_file = open("Data/money.txt", "r")
 balance_encoded = money_file.read()
 money_file.close()
@@ -118,9 +161,8 @@ run = True
 while run:
     win.blit(background,(0, 0))
     win.blit(nana_bek, nana_bek_rect)
-
     auto.BLIT()
-
+    display_info(balance)
 
 
     for event in pygame.event.get():
@@ -134,7 +176,7 @@ while run:
                 x, y = pygame.mouse.get_pos()
                 if nana_bek_rect.collidepoint(x, y):
                     balance += 1
-                    print("clicked nana")
+                auto.check_click(x, y)
 
     pygame.display.flip()
 
