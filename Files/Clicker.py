@@ -6,11 +6,14 @@ user32 = ctypes.windll.user32
 screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 sx, sy = screensize
 screen_middle = (sx / 2, sy / 2)
-
+# pygame stuff
 win = pygame.display.set_mode((screensize))
 pygame.display.set_caption("Clicker")
 
 pygame.init()
+
+clock = pygame.time.Clock()
+
 
 # Load Start Up
 background_small = pygame.image.load("images/background.png")
@@ -55,14 +58,15 @@ def decode(val, charset):
 
 
 
-
 # Define Autos / Buildings / do clicking for you
 class Autos():
     def __init__(self, datalist):
+        name = datalist[1]
         self.total_autos = 0
         self.autos = []
         self.auto_data = []
         self.auto_rects = []
+        self.username = name
         print("Auto Class Made")
 
     def New_Auto(self, Name, Cost, NSPps): # image files must be 50 x 50 pixels and JUST say the image name aka Clicker.png
@@ -88,6 +92,7 @@ class Autos():
             if N == "test":
                 win.blit(auto_test_img, (x, y))
 
+
     def check_click(self, x, y):
         max_x, max_y = screensize
         if nana_bek_rect.collidepoint(x, y): # quickly check they are not just clicking for spoons to save some time.
@@ -102,15 +107,16 @@ class Autos():
                 i += 1
             try:
                 i += Clicked # Test if Anything Is clicked
-                return self.auto_data[Clicked]
+                name, amount = self.auto_data[Clicked]
+                if name == "test":
+                    pass
             except:
                 pass
 
-# Init Autos
-auto = Autos([("test", 1)])
+    def Get_Data(self):
+        data_tuple = (self.total_autos, self.autos, self.username)
 
-# Generate Autos - They Will Appear top to bottom in the order that they are here.
-auto.New_Auto("test", 10, 1)
+
 
 def save():
     # Save Money
@@ -151,13 +157,26 @@ money_file.close()
 balance = decode(balance_encoded, code)
 balance = int(balance)
 
+data_f = open("Data/datalist.txt")
+data = data_f.read()
+data_f.close()
+datafile = decode(data, code)
+
+
+# Init Autos
+auto = Autos(datafile)
+
+# Generate Autos - They Will Appear top to bottom in the order that they are here.
+auto.New_Auto("test", 10, 1)
 
 # Tests Before Game Loads
+
+
 save()
 
 
 run = True
-
+TICKS = 0
 while run:
     win.blit(background,(0, 0))
     win.blit(nana_bek, nana_bek_rect)
@@ -179,5 +198,10 @@ while run:
                 auto.check_click(x, y)
 
     pygame.display.flip()
+    clock.tick(20) # finsih tick
+    TICKS += 1
+    if TICKS >= 100:
+        save()
+        TICKS = 0
 
 pygame.quit()
