@@ -30,9 +30,12 @@ nana_bek_rect = nana_bek.get_rect()
 x, y = screen_middle
 nana_bek_rect.move_ip(x - 231, y - 280.5)
 
+nana_click = pygame.image.load("images/Nana_bek.png")
+nana_click = pygame.transform.scale(nana_click, (23, 28))
+
 
 # Load Auto Images
-auto_test_img = pygame.image.load("images/Autos/test.png")
+auto_spoon_draw_img = pygame.image.load("images/Autos/spoon_draw.png")
 
 # def stuff
 balance = 0
@@ -69,13 +72,14 @@ class Autos():
         total,  autos_all, name = datalist
         autos_stuff = datalist[1]
         self.total_autos = int(total)
+        self.tautos = 0
         self.autos = autos_all
         self.autos_xy = []
         self.auto_data = []
 
         # Set all upgrades to 1
         self.up_test = 1
-
+        self.up_spoon_draw = 1
 
 
         self.auto_rects = []
@@ -85,10 +89,12 @@ class Autos():
 
     def New_Auto(self, Name, Cost, NSPps): # image files must be 50 x 50 pixels and JUST say the image name aka Clicker.png
         global sx
-        y_coord = self.total_autos * 50
+        y_coord = self.tautos * 50
+        print(y_coord)
         x_coord = sx - 100
         self.autos_xy.append((Name, Cost, x_coord, y_coord))
         self.auto_data.append((Name, NSPps, Cost))
+        self.tautos += 1
         x_pos = x_coord
         y_pos = y_coord
         width = 100
@@ -103,8 +109,8 @@ class Autos():
     def BLIT(self):
         for auto in self.autos_xy:
             N, C, x, y = auto
-            if N == "test":
-                win.blit(auto_test_img, (x, y))
+            if N == "spoon_draw":
+                win.blit(auto_spoon_draw_img, (x, y))
 
 
     def check_click(self, x, y):
@@ -123,12 +129,13 @@ class Autos():
                 i += Clicked # Test if Anything Is clicked
                 name, NSSps, Cost = self.auto_data[Clicked]
                 global balance
-                if name == "test":
+                if name == "spoon_draw":
                     if balance >= Cost:
                         balance -= Cost
-                        self.autos.append("test")
+                        self.autos.append("spoon_draw")
                         self.total_autos += 1
-                    
+
+
 
             except Exception as e:
                 print(e)
@@ -141,9 +148,15 @@ class Autos():
         global balance
         tickrate = 20
         for auto in self.autos:
-            if auto == "test":
-                balance += (0.2 * self.up_test) / tickrate
+            if auto == "spoon_draw":
+                balance += (0.2 * self.up_spoon_draw) / tickrate
 
+
+# How To Add A Auto:
+# 1) Call The New_Auto function,
+# 2) make 50 by 50 pixel image and call it the correct name,
+# 3) Add it to check_click and BLIT and Tick functions,
+# 4) Add A self.up_NAME to the .init function.
 
 
 def save(auto):
@@ -208,8 +221,8 @@ datafile = ast.literal_eval(datafile)
 # Init Autos
 auto = Autos(datafile)
 
-# Generate Autos - They Will Appear top to bottom in the order that they are here.
-auto.New_Auto("test", 10, 1)
+# Generate Autos - They Will Appear top to bottom in the order that they are here. - No Caps In Names
+auto.New_Auto("spoon_draw", 10, 1)
 
 # Tests Before Game Loads
 
