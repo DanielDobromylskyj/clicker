@@ -2,6 +2,7 @@ import pygame
 import ctypes
 import math
 import ast
+import time
 from threading import Thread
 
 user32 = ctypes.windll.user32
@@ -30,7 +31,7 @@ nana_bek_rect = nana_bek.get_rect()
 x, y = screen_middle
 nana_bek_rect.move_ip(x - 231, y - 280.5)
 
-nana_click = pygame.image.load("images/Nana_bek.png")
+nana_click = pygame.image.load("images/click.png")
 nana_click = pygame.transform.scale(nana_click, (23, 28))
 
 
@@ -138,7 +139,8 @@ class Autos():
 
 
             except Exception as e:
-                print(e)
+                #print(e)
+                pass
 
     def Get_Data(self):
         data_list = [self.total_autos, self.autos, self.username]
@@ -200,7 +202,11 @@ def display_info(balance):
 
 
 def clicked_animation_handler(mouse_x, mouse_y):
-    pass
+    for i in range(0, 800):
+        ii = i // 8
+        win.blit(nana_click, (mouse_x, mouse_y - ii))
+        time.sleep(0.00001)
+
 
 # Getting All Needed Data For Game. - MAIN BRANCH
 
