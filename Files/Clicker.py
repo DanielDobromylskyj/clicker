@@ -37,6 +37,8 @@ nana_click = pygame.transform.scale(nana_click, (23, 28))
 
 # Load Auto Images
 auto_spoon_draw_img = pygame.image.load("images/Autos/spoon_draw.png")
+auto_spoon_tree_img = pygame.image.load("images/Autos/spoon_tree.png")
+auto_title_img = pygame.image.load("images/Autos/Title.png")
 
 # def stuff
 balance = 0
@@ -64,7 +66,13 @@ def decode(val, charset):
         decoded = tempDc + charset[1][int(idy) - 10]
     return decoded
 
+def set_text(string, coordx, coordy, fontSize): #Function to set text
 
+    font = pygame.font.Font('freesansbold.ttf', fontSize)
+    text = font.render(string, True, (0, 0, 0))
+    textRect = text.get_rect()
+    textRect.center = (coordx, coordy)
+    return (text, textRect)
 
 # Define Autos / Buildings / do clicking for you
 
@@ -79,7 +87,7 @@ class Autos():
         self.auto_data = []
 
         # Set all upgrades to 1
-        self.up_test = 1
+        self.up_spoon_tree = 1
         self.up_spoon_draw = 1
 
 
@@ -91,14 +99,13 @@ class Autos():
     def New_Auto(self, Name, Cost, NSPps): # image files must be 50 x 50 pixels and JUST say the image name aka Clicker.png
         global sx
         y_coord = self.tautos * 50
-        print(y_coord)
-        x_coord = sx - 100
+        x_coord = sx - 250
         self.autos_xy.append((Name, Cost, x_coord, y_coord))
         self.auto_data.append((Name, NSPps, Cost))
         self.tautos += 1
         x_pos = x_coord
         y_pos = y_coord
-        width = 100
+        width = 250
         height = 50
 
         # make the rectangle variable
@@ -113,8 +120,22 @@ class Autos():
     def BLIT(self):
         for auto in self.autos_xy:
             N, C, x, y = auto
+
+            if N == "title":
+                win.blit(auto_title_img, (x, y))
             if N == "spoon_draw":
                 win.blit(auto_spoon_draw_img, (x, y))
+                s = set_text(str(C), sx - 150, y + 25, 20)
+                win.blit(s[0], s[1])
+            if N == "spoon_tree":
+                win.blit(auto_spoon_tree_img, (x,y))
+                s = set_text(str(C), sx - 150, y + 25, 20)
+                win.blit(s[0], s[1])
+
+
+
+            if not y == 0:
+                pygame.draw.line(win, (0, 0 ,0), (sx - 100, y), (sx - 100, y + 50), 5)
 
 
     def check_click(self, x, y):
@@ -139,6 +160,12 @@ class Autos():
                         self.autos.append("spoon_draw")
                         self.total_autos += 1
 
+                if name == "spoon_tree":
+                    if balance >= Cost:
+                        balance -= Cost
+                        self.autos.append("spoon_tree")
+                        self.total_autos += 1
+
 
 
             except Exception as e:
@@ -155,6 +182,9 @@ class Autos():
         for auto in self.autos:
             if auto == "spoon_draw":
                 balance += (0.2 * self.up_spoon_draw) / tickrate
+
+            if auto == "spoon_tree":
+                balance += (1 * self.up_spoon_tree) / tickrate
 
 
 # How To Add A Auto:
@@ -183,13 +213,6 @@ def save(auto):
 
 
 
-def set_text(string, coordx, coordy, fontSize): #Function to set text
-
-    font = pygame.font.Font('freesansbold.ttf', fontSize)
-    text = font.render(string, True, (0, 0, 0))
-    textRect = text.get_rect()
-    textRect.center = (coordx, coordy)
-    return (text, textRect)
 
 
 def display_info(balance):
@@ -231,7 +254,10 @@ datafile = ast.literal_eval(datafile)
 auto = Autos(datafile)
 
 # Generate Autos - They Will Appear top to bottom in the order that they are here. - No Caps In Names
+auto.New_Auto("title", 0, 0)
 auto.New_Auto("spoon_draw", 10, 1)
+auto.New_Auto("spoon_tree", 100, 2)
+
 
 # Tests Before Game Loads
 
