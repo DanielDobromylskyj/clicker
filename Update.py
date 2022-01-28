@@ -4,10 +4,10 @@ import time
 from distutils.dir_util import copy_tree
 
 
-there = os.path.exists("downloaded/clicker-main/Files/Data/version.txt")
+there = os.path.exists("new_game_files/clicker-main/Files/Data/version.txt")
 
 if there == True:
-    v1 = open("downloaded/clicker-main/Files/Data/version.txt", "r")
+    v1 = open("new_game_files/clicker-main/Files/Data/version.txt", "r")
     v1_r = v1.read()
     v1.close()
 
@@ -23,7 +23,7 @@ if there == True:
             ui = input("Are you sure? (y/n)")
 
             if ui == "y":
-                f = open("downloaded/clicker-main/Files/Data/install.txt", "r") # All Current Possible Stuff Is: 0 = main, 1 = image, 2 = data, 3 = Updater
+                f = open("new_game_files/clicker-main/Files/Data/install.txt", "r") # All Current Possible Stuff Is: 0 = main, 1 = image, 2 = data, 3 = Updater
                 install_data = f.read()
                 f.close()
 
@@ -33,17 +33,17 @@ if there == True:
                     chunk = test[element]
 
                     if chunk == "0":
-                        shutil.copy("downloaded/clicker-main/Files/Clicker.py", "Files/Clicker.py")
+                        shutil.copy("new_game_files/clicker-main/Files/Clicker.py", "Files/Clicker.py")
 
                     if chunk == "1":
-                        copy_tree("downloaded/clicker-main/Files/images", "Files/images")
+                        copy_tree("new_game_files/clicker-main/Files/images", "Files/images")
 
                     if chunk == "3":
-                        shutil.copy("downloaded/clicker-main/Update.py", "Update.py")
+                        shutil.copy("new_game_files/clicker-main/Update.py", "Update.py")
 
                 print("Update Complete! Cleaning Up")
 
-                shutil.rmtree('downloaded/clicker-main')
+                shutil.rmtree('new_game_files/clicker-main')
 
                 print("Clean Up Complete. Exiting")
                 time.sleep(3)
