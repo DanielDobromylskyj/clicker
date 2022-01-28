@@ -65,6 +65,7 @@ if there == True:
         print("Out-Dated Version. Exiting")
         time.sleep(3)
 else:
-    print("No Downloaded Update Detected. Is It In The Folder?")
+    os.makedirs("new_game_files")
+    print("No Downloaded Update Detected. Is It In The Folder? (Folder Has Been Created If Not ALready Done)")
     time.sleep(3)
 
