@@ -106,6 +106,9 @@ class Autos():
         self.auto_rects.append(rectangle)
         print("Generated New Auto Named '" + Name + "', Costing: " + str(Cost) + " Silver Spoons")
 
+    def Upgrade(self, Name):
+        pass
+
 
     def BLIT(self):
         for auto in self.autos_xy:
