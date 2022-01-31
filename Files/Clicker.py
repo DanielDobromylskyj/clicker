@@ -91,6 +91,7 @@ class Autos():
         self.up_spoon_draw = 1
 
 
+
         self.auto_rects = []
         self.username = name
 
@@ -113,8 +114,7 @@ class Autos():
         self.auto_rects.append(rectangle)
         print("Generated New Auto Named '" + Name + "', Costing: " + str(Cost) + " Silver Spoons")
 
-    def Upgrade(self, Name):
-        pass
+
 
 
     def BLIT(self):
@@ -168,6 +168,9 @@ class Autos():
 
 
 
+
+
+
             except Exception as e:
                 #print(e)
                 pass
@@ -186,6 +189,11 @@ class Autos():
             if auto == "spoon_tree":
                 balance += (1 * self.up_spoon_tree) / tickrate
 
+
+
+    def Check_Other(self):
+        # check for milestones
+        self.milestones = ["1000spoon", "1234"]
 
 # How To Add A Auto:
 # 1) Call The New_Auto function,
@@ -295,6 +303,7 @@ while run:
     TICKS += 1
     if TICKS >= 100:
         save(auto)
+        auto.Check_Other()
         TICKS = 0
 
 pygame.quit()
