@@ -4,6 +4,7 @@ import math
 import ast
 import time
 from threading import Thread
+from collections import Counter
 
 user32 = ctypes.windll.user32
 screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
@@ -36,9 +37,11 @@ nana_click = pygame.transform.scale(nana_click, (23, 28))
 
 
 # Load Auto Images
+auto_title_img = pygame.image.load("images/Autos/Title.png")
+
 auto_spoon_draw_img = pygame.image.load("images/Autos/spoon_draw.png")
 auto_spoon_tree_img = pygame.image.load("images/Autos/spoon_tree.png")
-auto_title_img = pygame.image.load("images/Autos/Title.png")
+auto_spoon_cave_img = pygame.image.load("images/Autos/spoon_cave.png")
 
 # def stuff
 balance = 0
@@ -89,6 +92,7 @@ class Autos():
         # Set all upgrades to 1
         self.up_spoon_tree = 1
         self.up_spoon_draw = 1
+        self.up_spoon_cave = 1
 
 
 
@@ -118,6 +122,8 @@ class Autos():
 
 
     def BLIT(self):
+
+
         for auto in self.autos_xy:
             N, C, x, y = auto
 
@@ -127,11 +133,20 @@ class Autos():
                 win.blit(auto_spoon_draw_img, (x, y))
                 s = set_text(str(C), sx - 150, y + 25, 20)
                 win.blit(s[0], s[1])
+                s = set_text(str(self.autos.count("spoon_draw")), sx - 50, y + 25, 20)
+                win.blit(s[0], s[1])
             if N == "spoon_tree":
                 win.blit(auto_spoon_tree_img, (x,y))
                 s = set_text(str(C), sx - 150, y + 25, 20)
                 win.blit(s[0], s[1])
-
+                s = set_text(str(self.autos.count("spoon_tree")), sx - 50, y + 25, 20)
+                win.blit(s[0], s[1])
+            if N == "spoon_cave":
+                win.blit(auto_spoon_cave_img, (x, y))
+                s = set_text(str(C), sx - 150, y + 25, 20)
+                win.blit(s[0], s[1])
+                s = set_text(str(self.autos.count("spoon_cave")), sx - 50, y + 25, 20)
+                win.blit(s[0], s[1])
 
 
             if not y == 0:
@@ -159,14 +174,16 @@ class Autos():
                         balance -= Cost
                         self.autos.append("spoon_draw")
                         self.total_autos += 1
-
                 if name == "spoon_tree":
                     if balance >= Cost:
                         balance -= Cost
                         self.autos.append("spoon_tree")
                         self.total_autos += 1
-
-
+                if name == "spoon_cave":
+                    if balance >= Cost:
+                        balance -= Cost
+                        self.autos.append("spoon_cave")
+                        self.total_autos += 1
 
 
 
@@ -188,6 +205,9 @@ class Autos():
 
             if auto == "spoon_tree":
                 balance += (1 * self.up_spoon_tree) / tickrate
+
+            if auto == "spoon_cave":
+                balance += (10 * self.up_spoon_tree) / tickrate
 
 
 
@@ -263,8 +283,9 @@ auto = Autos(datafile)
 
 # Generate Autos - They Will Appear top to bottom in the order that they are here. - No Caps In Names
 auto.New_Auto("title", 0, 0)
-auto.New_Auto("spoon_draw", 10, 1)
-auto.New_Auto("spoon_tree", 100, 2)
+auto.New_Auto("spoon_draw", 10, 0.1)
+auto.New_Auto("spoon_tree", 100, 1)
+auto.New_Auto("spoon_cave", 1500, 10)
 
 
 # Tests Before Game Loads

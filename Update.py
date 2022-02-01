@@ -44,6 +44,9 @@ try:
                         if chunk == "1":
                             copy_tree("new_game_files/clicker-main/Files/images", "Files/images")
 
+                        if chunk == "2":
+                            print("Dan has been too lazy to code this please tell him...")
+
                         if chunk == "3":
                             shutil.copy("new_game_files/clicker-main/Update.py", "Update.py")
                             shutil.rmtree("new_game_files/clicker-main")
