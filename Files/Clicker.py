@@ -1,55 +1,50 @@
-import pygame
-import ctypes
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5 import QtCore, QtGui
+from PIL import Image
 import math
 import ast
+import threading
+import ctypes
 import time
-from threading import Thread
-from collections import Counter
+
 
 user32 = ctypes.windll.user32
 screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-sx, sy = screensize
-screen_middle = (sx / 2, sy / 2)
-# pygame stuff
-win = pygame.display.set_mode((screensize))
-pygame.display.set_caption("Clicker")
+scrx, scry = screensize
 
-pygame.init()
-
-clock = pygame.time.Clock()
-
-
-# Load Start Up
-background_small = pygame.image.load("images/background.png")
-background = pygame.transform.scale(background_small, screensize)
-win.blit(background,(0, 0))
-pygame.display.update()
-
-# Load Images
-nana_bek_small = pygame.image.load("images/Nana_bek.png")
-nana_bek = pygame.transform.scale(nana_bek_small, (462, 561))
-nana_bek_rect = nana_bek.get_rect()
-x, y = screen_middle
-nana_bek_rect.move_ip(x - 231, y - 280.5)
-
-nana_click = pygame.image.load("images/click.png")
-nana_click = pygame.transform.scale(nana_click, (23, 28))
-
-
-# Load Auto Images
-auto_title_img = pygame.image.load("images/Autos/Title.png")
-
-auto_spoon_draw_img = pygame.image.load("images/Autos/spoon_draw.png")
-auto_spoon_tree_img = pygame.image.load("images/Autos/spoon_tree.png")
-auto_spoon_cave_img = pygame.image.load("images/Autos/spoon_cave.png")
-
-# def stuff
-balance = 0
-
-
-
-# Encoding and Decoding for money and other stored Data
 code = [10, "abcdefghijklmnopqrstuvwxyz0123456789+-. _*/\[](){},':;!@$฿%^&<>?=~`"] # character code
+
+CLICK = (0, 0)
+clicked_Check = False
+
+# Display Current Problems That MAY Be Fixed
+f = open("config.txt", "r")
+config = f.read()
+f.close()
+
+if config == "config_warnings = True":
+    config_warning = True
+elif config == "config_warnings = False":
+    config_warning = False
+else:
+    print("CONFIG FILE TAMPERED OR INCORRECT SPELLING")
+
+
+if config_warning == True:
+    print("= = = = = Problems = = = = =")
+    print("")
+    print("- No Click Animation")
+    print(" -Bal Still Increased")
+    print("")
+    print("- ")
+    print("")
+    print("")
+    print(" *** change 'warnings=True' to False in the config.txt file to remove this warning ***")
+    print("")
+    time.sleep(5)
+
 
 def encode(val, charset):
     encoded = ""
@@ -69,31 +64,161 @@ def decode(val, charset):
         decoded = tempDc + charset[1][int(idy) - 10]
     return decoded
 
-def set_text(string, coordx, coordy, fontSize): #Function to set text
+def collide(click, rect):
+    try:
+        rx, ry, rw, rh = rect
+        cx, cy = click
+        Output = False
+        for x in range(rx, rx + rw):
+            if x == cx:
+                for y in range(ry, ry + rh):
+                    if y == cy:
+                        Output = True
 
-    font = pygame.font.Font('freesansbold.ttf', fontSize)
-    text = font.render(string, True, (0, 0, 0))
-    textRect = text.get_rect()
-    textRect.center = (coordx, coordy)
-    return (text, textRect)
+    except Exception as e:
+        Output = e
+        print("ERROR IS: ", rect)
 
-# Define Autos / Buildings / do clicking for you
+    return Output
+
+
+money_file = open("Data/money.txt", "r")
+balance_encoded = money_file.read()
+money_file.close()
+balance = decode(balance_encoded, code)
+balance = float(balance).__round__()
+balance = int(balance)
+print("Starting Balance: ", balance)
+
+
+class App(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.title = 'PyQt5 Nana B Clicker'
+        self.left = 0
+        self.top = 0
+
+        user32 = ctypes.windll.user32
+        screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+        x, y = screensize
+        mx = x // 2
+        my = y // 2
+        self.middle_screen = (mx, my)
+
+        self.screensize = screensize
+
+        self.width = x
+        self.height = y
+        self.initUI()
+        self.auto_data = AUTODATA
+
+    def initUI(self):
+        global balance
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+
+        flags = QtCore.Qt.WindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(flags)
+
+        # Create widget
+        label = QLabel(self)
+        pixmap = QPixmap("images/background.png")
+        x, y = self.screensize
+        mx, my = self.middle_screen
+        self.resize(x, y)
+        label.setPixmap(pixmap)
+
+        x = x - 250
+
+        global nana_bek_rect
+        nana_bek_rect = self.Blit_Image(self.middle_screen, "images/Nana_bek.png", center=True, Return=True)
+        self.nana_bek_rect = nana_bek_rect
+        self.Blit_Image((x, 0), "images/Autos/Title.png")
+        rect_spoon_draw = self.Blit_Image((x, 50), "images/Autos/spoon_draw.png")
+        rect_spoon_tree = self.Blit_Image((x, 100), "images/Autos/spoon_tree.png")
+        rect_spoon_cave = self.Blit_Image((x, 150), "images/Autos/spoon_cave.png")
+
+        self.display_bal = QLabel(self)
+        self.display_bal.setText(str(round(balance)) + " Nanas Silver Spoons")
+        self.display_bal_size = self.display_bal.size().width()
+        self.display_bal.move(mx - (self.display_bal_size // 2), 50)
+
+        # Set Fonts
+        app.setStyleSheet("QLabel{font-size: 18pt;}")
+
+
+        # blit images
+
+
+    def Blit_Image(self, xy, location, center = False, Return = False):
+        label = QLabel(self)
+        pixmap = QPixmap(location)
+        label.setPixmap(pixmap)
+        x, y = xy
+        if center == True:
+            im = Image.open(location)
+            width, height = im.size
+            new_x = x - (width // 2)
+            new_y = y - (height // 2)
+            label.move(new_x, new_y)
+        else:
+            label.move(x, y)
+
+        if Return == True:
+            return (new_x, new_y, width ,height)
+
+    def mouseReleaseEvent(self, QMouseEvent):
+        global clicked_Check
+        global CLICK
+        cursor = QtGui.QCursor()
+        cursor = cursor.pos()
+        cursor = str(cursor).split("(")
+        cursor = cursor[1].split(")")
+        cursor = cursor[0].split(", ")
+        CLICK = (int(cursor[0]), int(cursor[1]))
+        clicked_Check = True
+        if collide(CLICK, self.nana_bek_rect):
+            C = threading.Thread(target=self.click_handler, args=[CLICK])
+            C.start()
+
+    def display(self):
+        mx, my = self.middle_screen
+        self.display_bal.setText(str(round(balance)) + " Nanas Silver Spoons")
+        self.display_bal_size = self.display_bal.size().width()
+        self.display_bal.move(mx - (self.display_bal_size // 2), 50)
+
+
+    def click_handler(self, xy):
+        xpos, ypos = xy
+        click_handler = QLabel(self)
+        pixmap = QPixmap("images/click.png")
+        click_handler.setPixmap(pixmap)
+        click_handler.move(xpos, ypos)
+        self.show()
+        for y in range(100):
+            addy = ypos + y
+            click_handler.move(xpos, addy)
+
 
 class Autos():
     def __init__(self, datalist):
         total,  autos_all, name = datalist
-        autos_stuff = datalist[1]
         self.total_autos = int(total)
         self.tautos = 0
         self.autos = autos_all
         self.autos_xy = []
         self.auto_data = []
 
+        global AUTODATA
+        AUTODATA = self.autos_xy
+
         # Set all upgrades to 1
         self.up_spoon_tree = 1
         self.up_spoon_draw = 1
         self.up_spoon_cave = 1
 
+        self.check_click()
 
 
         self.auto_rects = []
@@ -102,9 +227,9 @@ class Autos():
         print("Auto Class Made")
 
     def New_Auto(self, Name, Cost, NSPps): # image files must be 50 x 50 pixels and JUST say the image name aka Clicker.png
-        global sx
+        global scrx
         y_coord = self.tautos * 50
-        x_coord = sx - 250
+        x_coord = scrx - 250
         self.autos_xy.append((Name, Cost, x_coord, y_coord))
         self.auto_data.append((Name, NSPps, Cost))
         self.tautos += 1
@@ -114,100 +239,82 @@ class Autos():
         height = 50
 
         # make the rectangle variable
-        rectangle = pygame.Rect(x_pos, y_pos, width, height)
+        rectangle = (x_pos, y_pos, width, height)
         self.auto_rects.append(rectangle)
         print("Generated New Auto Named '" + Name + "', Costing: " + str(Cost) + " Silver Spoons")
 
 
 
 
-    def BLIT(self):
+    def check_click(self):
+        global clicked_Check
+        global CLICK
+        global nana_bek_rect
+        global balance
 
-
-        for auto in self.autos_xy:
-            N, C, x, y = auto
-
-            if N == "title":
-                win.blit(auto_title_img, (x, y))
-            if N == "spoon_draw":
-                win.blit(auto_spoon_draw_img, (x, y))
-                s = set_text(str(C), sx - 150, y + 25, 20)
-                win.blit(s[0], s[1])
-                s = set_text(str(self.autos.count("spoon_draw")), sx - 50, y + 25, 20)
-                win.blit(s[0], s[1])
-            if N == "spoon_tree":
-                win.blit(auto_spoon_tree_img, (x,y))
-                s = set_text(str(C), sx - 150, y + 25, 20)
-                win.blit(s[0], s[1])
-                s = set_text(str(self.autos.count("spoon_tree")), sx - 50, y + 25, 20)
-                win.blit(s[0], s[1])
-            if N == "spoon_cave":
-                win.blit(auto_spoon_cave_img, (x, y))
-                s = set_text(str(C), sx - 150, y + 25, 20)
-                win.blit(s[0], s[1])
-                s = set_text(str(self.autos.count("spoon_cave")), sx - 50, y + 25, 20)
-                win.blit(s[0], s[1])
-
-
-            if not y == 0:
-                pygame.draw.line(win, (0, 0 ,0), (sx - 100, y), (sx - 100, y + 50), 5)
-
-
-    def check_click(self, x, y):
         max_x, max_y = screensize
-        if nana_bek_rect.collidepoint(x, y): # quickly check they are not just clicking for spoons to save some time.
-            pass
-        else:
+        if clicked_Check == True:
+            clicked_Check = False
+            x, y = CLICK
 
-            i = 0
-            for button in self.auto_rects:
-                if button.collidepoint(x, y):
-                    Clicked = i
+            if collide((x,y), nana_bek_rect): #nana_bek_rect.collidepoint(x, y): # quickly check they are not just clicking for spoons to save some time.
+                balance += 1
 
-                i += 1
-            try:
-                i += Clicked # Test if Anything Is clicked
-                name, NSSps, Cost = self.auto_data[Clicked]
-                global balance
-                if name == "spoon_draw":
-                    if balance >= Cost:
-                        balance -= Cost
-                        self.autos.append("spoon_draw")
-                        self.total_autos += 1
-                if name == "spoon_tree":
-                    if balance >= Cost:
-                        balance -= Cost
-                        self.autos.append("spoon_tree")
-                        self.total_autos += 1
-                if name == "spoon_cave":
-                    if balance >= Cost:
-                        balance -= Cost
-                        self.autos.append("spoon_cave")
-                        self.total_autos += 1
+            elif collide((x,y), nana_bek_rect) == False:
+                i = 0
+                for button in self.auto_rects:
+                    if collide((x, y), button):
+                        Clicked = i
+
+                    i += 1
+                try:
+                    i += Clicked # Test if Anything Is clicked
+                    name, NSSps, Cost = self.auto_data[Clicked]
+                    if name == "spoon_draw":
+                        if balance >= Cost:
+                            balance -= Cost
+                            self.autos.append("spoon_draw")
+                            self.total_autos += 1
+                    if name == "spoon_tree":
+                        if balance >= Cost:
+                            balance -= Cost
+                            self.autos.append("spoon_tree")
+                            self.total_autos += 1
+                    if name == "spoon_cave":
+                        if balance >= Cost:
+                            balance -= Cost
+                            self.autos.append("spoon_cave")
+                            self.total_autos += 1
 
 
 
 
-            except Exception as e:
-                #print(e)
-                pass
+                except Exception as e:
+                    #print(e)
+                    pass
+            else:
+                print(collide((x,y), nana_bek_rect))
 
     def Get_Data(self):
         data_list = [self.total_autos, self.autos, self.username]
         return data_list
 
-    def Tick(self):
+    def Tick(self, tickrate = 60):
         global balance
-        tickrate = 20
-        for auto in self.autos:
-            if auto == "spoon_draw":
-                balance += (0.2 * self.up_spoon_draw) / tickrate
+        if tickrate == 0:
+            a = 2
+            for i in range(40):
+                a = a * i
+        else:
+            for auto in self.autos:
+                if auto == "spoon_draw":
+                    balance += (0.2 * self.up_spoon_draw) / tickrate
 
-            if auto == "spoon_tree":
-                balance += (1 * self.up_spoon_tree) / tickrate
+                if auto == "spoon_tree":
+                    balance += (1 * self.up_spoon_tree) / tickrate
 
-            if auto == "spoon_cave":
-                balance += (10 * self.up_spoon_tree) / tickrate
+                if auto == "spoon_cave":
+                    balance += (10 * self.up_spoon_tree) / tickrate
 
 
 
@@ -215,17 +322,34 @@ class Autos():
         # check for milestones
         self.milestones = ["1000spoon", "1234"]
 
-# How To Add A Auto:
-# 1) Call The New_Auto function,
-# 2) make 50 by 50 pixel image and call it the correct name,
-# 3) Add it to check_click and BLIT and Tick functions,
-# 4) Add A self.up_NAME to the .init function.
+
+data_f = open("Data/datalist.txt")
+data = data_f.read()
+data_f.close()
+datafile = decode(data, code)
+datafile = ast.literal_eval(datafile)
+
+# Init Autos
+
+app = QApplication(sys.argv)
+
+
+auto = Autos(datafile)
+
+auto.New_Auto("title", 0, 0)
+auto.New_Auto("spoon_draw", 10, 0.1)
+auto.New_Auto("spoon_tree", 100, 1)
+auto.New_Auto("spoon_cave", 1500, 10)
+auto.check_click()
+
+ex = App()
+i = 0
 
 
 def save(auto):
     # Save Money
     global balance
-    cbalance = balance.__round__()
+    cbalance = round(balance)
     encoded = encode(str(cbalance), code)
     f = open("Data/money.txt", "w")
     f.write(encoded)
@@ -240,91 +364,34 @@ def save(auto):
 
 
 
+FPS = 60
+MSPF = 1000 / FPS
+last_frame = time.perf_counter() * 1000
+
+def GameLoop():
+    TICK = 0
+    while True:
+        now = time.perf_counter() * 1000
+
+        ex.display()
+        auto.check_click()
+        auto.Tick()
+
+        last_frame = time.perf_counter() * 1000
+        elapsed = now - last_frame
+        time.sleep(max(0, (now + MSPF) / 1000.0 - time.perf_counter()))
 
 
+        TICK += 1 # wait 5s then Save
+        if TICK >= (5 * FPS):
+            TICK = 0
+            save(auto)
 
-def display_info(balance):
-    global screen_middle
-    balance = balance.__round__()
-    x = screen_middle[0]
-    if balance <= 1:
-        bal = str(balance) + " Nana's Silver Spoon"
-    else:
-        bal = str(balance) + " Nana's Silver Spoons"
-    s = set_text(bal, x, 100, 20)
-    win.blit(s[0], s[1])
+t = threading.Thread(target=GameLoop)
+t.start()
 
 
-def clicked_animation_handler(mouse_x, mouse_y):
-    for i in range(0, 800):
-        ii = i // 8
-        win.blit(nana_click, (mouse_x, mouse_y - ii))
-        time.sleep(0.00001)
-
-
-# Getting All Needed Data For Game. - MAIN BRANCH
-
-# Get / Decode Money - SUB BRANCH
-money_file = open("Data/money.txt", "r")
-balance_encoded = money_file.read()
-money_file.close()
-balance = decode(balance_encoded, code)
-balance = float(balance).__round__()
-balance = int(balance)
-
-data_f = open("Data/datalist.txt")
-data = data_f.read()
-data_f.close()
-datafile = decode(data, code)
-datafile = ast.literal_eval(datafile)
-
-# Init Autos
-auto = Autos(datafile)
-
-# Generate Autos - They Will Appear top to bottom in the order that they are here. - No Caps In Names
-auto.New_Auto("title", 0, 0)
-auto.New_Auto("spoon_draw", 10, 0.1)
-auto.New_Auto("spoon_tree", 100, 1)
-auto.New_Auto("spoon_cave", 1500, 10)
-
-
-# Tests Before Game Loads
-
-
-save(auto)
-
-
-run = True
-TICKS = 0
-while run:
-    win.blit(background,(0, 0))
-    win.blit(nana_bek, nana_bek_rect)
-    auto.BLIT()
-    auto.Tick()
-    display_info(balance)
-
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-
-        # Detect If nana Is Clicked
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_presses = pygame.mouse.get_pressed()
-            if mouse_presses[0]:
-                x, y = pygame.mouse.get_pos()
-                if nana_bek_rect.collidepoint(x, y):
-                    balance += 1
-                    thread = Thread(target=clicked_animation_handler, args=(x,y))
-                    thread.start()
-                auto.check_click(x, y)
-
-    pygame.display.flip()
-    clock.tick(20) # finsih tick
-    TICKS += 1
-    if TICKS >= 100:
-        save(auto)
-        auto.Check_Other()
-        TICKS = 0
-
-pygame.quit()
+ex.show()
+app.exec_()
+exit("Exit Failed")
+exit("Exit")

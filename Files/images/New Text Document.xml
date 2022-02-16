@@ -1,0 +1,57 @@
+xml version=1.0 encoding=UTF-8
+ui version=4.0
+ classDialogclass
+ widget class=QDialog name=Dialog
+  property name=geometry
+   rect
+    x0x
+    y0y
+    width425width
+    height304height
+   rect
+  property
+  property name=windowTitle
+   stringDialogstring
+  property
+  property name=styleSheet
+   string notr=truebackground-colorrgb(0, 255, 255);
+backgroundurl(bellimagesroundGould.jpg)string
+  property
+  widget class=QPushButton name=pushButton
+   property name=geometry
+    rect
+     x20x
+     y110y
+     width401width
+     height111height
+    rect
+   property
+   property name=sizePolicy
+    sizepolicy hsizetype=Minimum vsizetype=Fixed
+     horstretch0horstretch
+     verstretch0verstretch
+    sizepolicy
+   property
+   property name=font
+    font
+     familyMonotype Corsivafamily
+     pointsize48pointsize
+     italictrueitalic
+    font
+   property
+   property name=cursor
+    cursorShapeArrowCursorcursorShape
+   property
+   property name=styleSheet
+    string notr=truebackground-image url(bmpsbeldan.bmp);string
+   property
+   property name=text
+    stringDing!Dong!string
+   property
+  widget
+ widget
+ resources
+  include location=qtScreendesignqtResource.qrc
+ resources
+ connections
+ui
