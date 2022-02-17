@@ -201,18 +201,25 @@ class App(QWidget):
         rect_spoon_draw = self.Blit_Image((x, 50), "images/Autos/spoon_draw.png")
         rect_spoon_tree = self.Blit_Image((x, 100), "images/Autos/spoon_tree.png")
         rect_spoon_cave = self.Blit_Image((x, 150), "images/Autos/spoon_cave.png")
+        rect_spoon_church = self.Blit_Image((x, 200), "images/Autos/spoon_church.png")
 
         self.spoondraw1 = QLabel(self)
         self.spoondraw2 = QLabel(self)
+
         self.spoontree1 = QLabel(self)
         self.spoontree2 = QLabel(self)
+
         self.spooncave1 = QLabel(self)
         self.spooncave2 = QLabel(self)
 
+        self.spoonchurch1 = QLabel(self)
+        self.spoonchurch2 = QLabel(self)
 
-        self.Blit_Image((x, 50), "images/Autos/lines.png")
+
+        self.Blit_Image((x, 50), "images/Autos/lines.png") # For Every auto add a new one off these
         self.Blit_Image((x, 100), "images/Autos/lines.png")
         self.Blit_Image((x, 150), "images/Autos/lines.png")
+        self.Blit_Image((x, 200), "images/Autos/lines.png")
 
 
         self.display_bal = QLabel(self)
@@ -278,6 +285,7 @@ class App(QWidget):
             spoon_draws = 0
             spoon_trees = 0
             spoon_caves = 0
+            spoon_churchs = 0
 
             # Run Check
             for AUTO in ALL:
@@ -287,6 +295,8 @@ class App(QWidget):
                     spoon_trees += 1
                 if AUTO == "spoon_cave":
                     spoon_caves += 1
+                if AUTO == "spoon_church":
+                    spoon_churchs += 1
 
 
             self.spoondraw1.setText("10")
@@ -312,6 +322,16 @@ class App(QWidget):
             self.spooncave2.setText(str(spoon_caves))
             self.spooncave2.move(x2, 150 + 13)
             self.spooncave2.adjustSize()
+
+            self.spoonchurch1.setText("11500")
+            self.spoonchurch1.move(x1, 200 + 13)
+            self.spoonchurch1.adjustSize()
+
+            self.spoonchurch2.setText(str(spoon_churchs))
+            self.spoonchurch2.move(x2, 200 + 13)
+            self.spoonchurch2.adjustSize()
+
+
 
 
 
@@ -339,6 +359,7 @@ class Autos():
         self.up_spoon_tree = 1
         self.up_spoon_draw = 1
         self.up_spoon_cave = 1
+        self.up_spoon_church = 1
 
         self.check_click()
 
@@ -407,6 +428,11 @@ class Autos():
                             balance -= Cost
                             self.autos.append("spoon_cave")
                             self.total_autos += 1
+                    if name == "spoon_church":
+                        if balance >= Cost:
+                            balance -= Cost
+                            self.autos.append("spoon_church")
+                            self.total_autos += 1
 
 
 
@@ -439,7 +465,10 @@ class Autos():
                     balance += (1 * self.up_spoon_tree) / tickrate
 
                 if auto == "spoon_cave":
-                    balance += (10 * self.up_spoon_tree) / tickrate
+                    balance += (10 * self.up_spoon_cave) / tickrate
+
+                if auto == "spoon_church":
+                    balance += (65 * self.up_spoon_church) / tickrate
 
 
 
@@ -460,6 +489,7 @@ auto.New_Auto("title", 0, 0)
 auto.New_Auto("spoon_draw", 10, 0.1)
 auto.New_Auto("spoon_tree", 100, 1)
 auto.New_Auto("spoon_cave", 1500, 10)
+auto.New_Auto("spoon_church", 11500, 65)
 
 
 

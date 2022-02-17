@@ -1,0 +1,37 @@
+Added:
+- Easier Setup
+> No Pygame Module
+> No Moving Files
+
+- Faster Game
+> Game Will Run Smoother On Low End Hardware*
+* Not Fully Tested
+> Pygame Was Slow
+
+- UI
+> Updated Sprites
+> Moved Writing Around
+> Nicer Font (imo)
+
+- Autos
+> Added Church / Castle, 11.5k, Gives 65/s
+
+- Encryption
+> Added Custom More Complex Encrypting / Decrypting
+
+- Anti-Tamper
+> Harder To Increase Your Money Or Autos By Modifing .txt Files
+> Will Ask You If You Want To Reset Tampered Files
+
+Removed:
+- Pygame Module
+> It Was Slow, New Module Should Be Faster*
+* Mainly On Low End Hardware
+
+- Click Animation (Not Perminante)
+> Could Not Get It Working
+
+Known Problems
+
+- Crash On Start Up / 20s After
+> Restart your game its the Module Saving things at a funny time
