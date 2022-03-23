@@ -10,7 +10,6 @@ import ctypes
 import time
 import random
 
-
 user32 = ctypes.windll.user32
 screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 scrx, scry = screensize
