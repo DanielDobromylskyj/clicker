@@ -216,6 +216,9 @@ class Autos():
 win = Tk()
 
 
+def click():
+    print("Click")
+
 def RunGame(balance, datafile):
     for widget in win.winfo_children():
         widget.destroy()
@@ -234,9 +237,13 @@ def RunGame(balance, datafile):
     #img_background = ImageTk.PhotoImage(Image.open("images/menu_background.png"))
 
     game_back = Label(frame, image=img_background)
-    game_back.pack()
+    game_back.pack(anchor="center")
     win.update()
 
+
+    #img_click = ImageTk.PhotoImage(Image.open("images/Nana_bek.png"))
+    nana_click = Button(frame, text="", command=click, image=img_click, borderwidth=0, activebackground="#9ad9ea", background="#9ad9ea")
+    nana_click.place(anchor="center", x=screen_x / 2 , y=screen_y / 2)
     global spdraw
     global sptree
 
@@ -327,8 +334,10 @@ def LoadGame():
 
     # Sumin else
     global img_background
+    global img_click
 
     img_background = ImageTk.PhotoImage(Image.open("images/background.png"))
+    img_click = ImageTk.PhotoImage(Image.open("images/Nana_bek.png"))
 
     pb1['value'] += 25
     win.update()
@@ -347,8 +356,8 @@ frame.pack()
 frame.place(anchor='center', relx=0.5, rely=0.5)
 # Create an object of tkinter ImageTk
 img = ImageTk.PhotoImage(Image.open("images/menu_background.png"))
-#img_background = ImageTk.PhotoImage(Image.open("images/background.png"))
 # Create a Label Widget to display the text or Image
+
 mainback = Label(frame, image = img)
 mainback.pack()
 
